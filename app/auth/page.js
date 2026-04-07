@@ -1,10 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { auth } from "../utils/firebase";
+import { auth, googleProvider } from "../utils/firebase";
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
+  signInWithPopup,
   onAuthStateChanged,
 } from "firebase/auth";
 import { useRouter } from "next/navigation";
@@ -26,6 +27,30 @@ export default function AuthPage() {
 
     return () => unsubscribe();
   }, [router]);
+
+  // handles Google sign in separately from the email/password form
+  const handleGoogleSignIn = async () => {
+    setMessage("");
+
+    try {
+      await signInWithPopup(auth, googleProvider);
+      router.push("/");
+    } catch (error) {
+      console.error(error);
+
+      switch (error.code) {
+        case "auth/popup-closed-by-user":
+          setMessage("Google sign in was cancelled.");
+          break;
+        case "auth/popup-blocked":
+          setMessage("Popup was blocked by the browser.");
+          break;
+        default:
+          setMessage("Google sign in failed.");
+      }
+    }
+  };
+
   // handleSubmit is used for both registration and login, so it checks the mode and calls the appropriate Firebase function
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -71,9 +96,18 @@ export default function AuthPage() {
           Satguru Store
         </h1>
         {/* The heading changes based on whether the user is in register mode or sign-in mode */}
-        <h2 className="mb-6 text-center text-xl font-semibold">
+        <h2 className="mb-6 text-center text-xl font-semibold text-black">
           {isRegisterMode ? "Register" : "Sign In"}
         </h2>
+        {/* Google sign in button sits above the email/password inputs */}
+        <button
+          type="button"
+          onClick={handleGoogleSignIn}
+          className="mb-4 w-full rounded-md border border-black bg-white px-4 py-3 text-black hover:bg-gray-100"
+        >
+          Sign in with Google
+        </button>
+
         {/* The form uses the handleSubmit function for both registration and login, so it checks the mode and calls the appropriate Firebase function */}
         <form onSubmit={handleSubmit} className="space-y-4">
           {isRegisterMode && (
@@ -82,7 +116,7 @@ export default function AuthPage() {
               placeholder="Username"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              className="w-full rounded-md border px-4 py-3"
+              className="w-full rounded-md border border-black px-4 py-3 text-black placeholder-black"
             />
           )}
 
@@ -91,7 +125,7 @@ export default function AuthPage() {
             placeholder="Email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="w-full rounded-md border px-4 py-3"
+            className="w-full rounded-md border border-black px-4 py-3 text-black placeholder-black"
             required
           />
 
@@ -100,7 +134,7 @@ export default function AuthPage() {
             placeholder="Password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="w-full rounded-md border px-4 py-3"
+            className="w-full rounded-md border border-black px-4 py-3 text-black placeholder-black"
             required
           />
 
@@ -112,7 +146,7 @@ export default function AuthPage() {
             {isRegisterMode ? "Create Account" : "Sign In"}
           </button>
         </form>
-
+        {/* This button toggles between register mode and sign-in mode, allowing users to switch between the two forms. It also clears any messages when switching modes. */}
         <button
           onClick={() => {
             setIsRegisterMode(!isRegisterMode);
