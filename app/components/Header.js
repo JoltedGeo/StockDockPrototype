@@ -47,7 +47,14 @@ export default function Header() {
   return (
     <header className="border-b border-gray-200 bg-white text-black">
       <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
-        <Link href="/" className="text-2xl font-bold text-black">
+        <Link
+          href="/"
+          className="text-2xl font-bold"
+          style={{
+            color: "black",
+            WebkitTextStroke: "1px #5478FF",
+          }}
+        >
           Satguru Store
         </Link>
 
