@@ -11,7 +11,9 @@ export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
   const dropdownRef = useRef(null);
   const router = useRouter();
-  // This useEffect checks the authentication state of the user when the Header component mounts. It listens for changes in authentication status and updates the user state accordingly
+
+  // This useEffect checks the authentication state of the user when the Header component mounts.
+  // It listens for changes in authentication status and updates the user state accordingly.
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
@@ -19,7 +21,9 @@ export default function Header() {
 
     return () => unsubscribe();
   }, []);
-  // This useEffect adds an event listener to detect clicks outside the dropdown menu. If a click is detected outside the menu, it closes the menu by setting menuOpen to false.
+
+  // This useEffect adds an event listener to detect clicks outside the dropdown menu.
+  // If a click is detected outside the menu, it closes the menu by setting menuOpen to false.
   useEffect(() => {
     function handleClickOutside(event) {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -30,7 +34,9 @@ export default function Header() {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
-  // This function handles the sign-out process. It calls the Firebase signOut function, closes the menu, and redirects the user to the home page.
+
+  // This function handles the sign-out process.
+  // It calls the Firebase signOut function, closes the menu, and redirects the user to the home page.
   const handleSignOut = async () => {
     try {
       await signOut(auth);
@@ -40,7 +46,8 @@ export default function Header() {
       console.error("Sign out error:", error);
     }
   };
-  // displays the username by taking the users email and removeing the @ and domain part again haha
+
+  // Displays the username by taking the user's email and removing the @ and domain part.
   const displayName =
     user?.displayName || user?.email?.split("@")[0] || "My Account";
 
@@ -59,16 +66,31 @@ export default function Header() {
         </Link>
 
         <nav className="hidden gap-6 md:flex">
-          <Link href="/" className="text-sm font-medium text-black hover:underline">
+          <Link
+            href="/"
+            className="text-sm font-medium text-black hover:underline"
+          >
             Home
           </Link>
-          <Link href="/" className="text-sm font-medium text-black hover:underline">
+
+          <Link
+            href="/search"
+            className="text-sm font-medium text-black hover:underline"
+          >
             Products
           </Link>
-          <Link href="/" className="text-sm font-medium text-black hover:underline">
+
+          <Link
+            href="/"
+            className="text-sm font-medium text-black hover:underline"
+          >
             About
           </Link>
-          <Link href="/" className="text-sm font-medium text-black hover:underline">
+
+          <Link
+            href="/"
+            className="text-sm font-medium text-black hover:underline"
+          >
             Contact
           </Link>
         </nav>
