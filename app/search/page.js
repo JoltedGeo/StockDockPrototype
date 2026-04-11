@@ -57,55 +57,24 @@ export default function SearchPage() {
   }, [query]);
 
   return (
-    <main
-      style={{
-        maxWidth: "1200px",
-        margin: "0 auto",
-        padding: "32px 24px 60px",
-      }}
-    >
-      <div style={{ marginBottom: "20px" }}>
+    <main className="mx-auto max-w-6xl px-6 py-8 pb-16">
+      {/* Back Navigation */}
+      <div className="mb-5">
         <Link
           href="/"
-          style={{
-            textDecoration: "none",
-            color: "#4f46e5",
-            fontWeight: "500",
-            fontSize: "16px",
-          }}
+          className="text-base font-medium text-indigo-600 hover:underline"
         >
-          ← Back to Home
+          &larr; Back to Home
         </Link>
       </div>
 
-      <div
-        style={{
-          background: "linear-gradient(135deg, #eef2ff, #ffffff)",
-          border: "1px solid #e5e7eb",
-          borderRadius: "20px",
-          padding: "28px",
-          marginBottom: "28px",
-        }}
-      >
-        <h1
-          style={{
-            fontSize: "40px",
-            fontWeight: "800",
-            marginBottom: "12px",
-            color: "#111827",
-          }}
-        >
+      {/* Search Header */}
+      <div className="mb-7 rounded-2xl border border-gray-200 bg-gradient-to-br from-indigo-50 to-white p-7">
+        <h1 className="mb-3 text-4xl font-extrabold text-gray-900">
           Search Products
         </h1>
 
-        <p
-          style={{
-            marginBottom: "20px",
-            color: "#4b5563",
-            fontSize: "18px",
-            maxWidth: "700px",
-          }}
-        >
+        <p className="mb-5 max-w-2xl text-lg text-gray-600">
           Browse Satguru Store items by searching product names or categories.
         </p>
 
@@ -114,127 +83,52 @@ export default function SearchPage() {
           placeholder="Search products..."
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          style={{
-            width: "100%",
-            maxWidth: "520px",
-            padding: "14px 16px",
-            border: "1px solid #d1d5db",
-            borderRadius: "12px",
-            fontSize: "16px",
-            outline: "none",
-            backgroundColor: "#fff",
-          }}
+          className="w-full max-w-lg rounded-xl border border-gray-300 bg-white text-gray-900 placeholder-gray-500 px-4 py-3 text-base outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
         />
       </div>
 
-      <div
-        style={{
-          marginBottom: "18px",
-          color: "#374151",
-          fontWeight: "500",
-          fontSize: "16px",
-        }}
-      >
+      {/* Results Count */}
+      <div className="mb-5 text-base font-medium text-gray-700">
         {filteredProducts.length} product{filteredProducts.length !== 1 ? "s" : ""} found
       </div>
 
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
-          gap: "20px",
-        }}
-      >
+      {/* Product Grid */}
+      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
         {filteredProducts.length > 0 ? (
           filteredProducts.map((item) => (
             <div
               key={item.id}
-              style={{
-                border: "1px solid #e5e7eb",
-                borderRadius: "18px",
-                padding: "16px",
-                backgroundColor: "#fff",
-                boxShadow: "0 6px 20px rgba(0,0,0,0.06)",
-                transition: "0.2s ease",
-              }}
+              className="rounded-[18px] border border-gray-200 bg-white p-4 shadow-sm transition-all hover:shadow-lg hover:-translate-y-1"
             >
               <img
                 src={item.image}
                 alt={item.name}
-                style={{
-                  width: "100%",
-                  height: "180px",
-                  objectFit: "cover",
-                  borderRadius: "14px",
-                  marginBottom: "14px",
-                  backgroundColor: "#f3f4f6",
-                }}
+                className="mb-3 h-44 w-full rounded-xl bg-gray-100 object-cover"
               />
 
-              <div
-                style={{
-                  display: "inline-block",
-                  padding: "6px 10px",
-                  borderRadius: "999px",
-                  backgroundColor: "#eef2ff",
-                  color: "#4338ca",
-                  fontSize: "13px",
-                  fontWeight: "600",
-                  marginBottom: "10px",
-                }}
-              >
+              <div className="mb-2 inline-block rounded-full bg-indigo-50 px-3 py-1 text-xs font-semibold text-indigo-700">
                 {item.category}
               </div>
 
-              <h2
-                style={{
-                  margin: "0 0 8px 0",
-                  fontSize: "22px",
-                  fontWeight: "700",
-                  color: "#111827",
-                }}
-              >
+              <h2 className="mb-2 text-xl font-bold text-gray-900">
                 {item.name}
               </h2>
 
-              <p
-                style={{
-                  margin: "0 0 16px 0",
-                  fontWeight: "700",
-                  fontSize: "20px",
-                  color: "#111827",
-                }}
-              >
-                ₹{item.price.toLocaleString("en-IN")}
+              <p className="mb-4 text-lg font-bold text-gray-900">
+                ${item.price.toLocaleString()}
               </p>
 
-              <button
-                style={{
-                  width: "100%",
-                  padding: "12px",
-                  border: "none",
-                  borderRadius: "12px",
-                  backgroundColor: "#4f46e5",
-                  color: "#fff",
-                  fontWeight: "600",
-                  fontSize: "15px",
-                  cursor: "pointer",
-                }}
+              {/* View Product Link - Replaced Button */}
+              <Link
+                href={`/item/${item.id}`}
+                className="block w-full rounded-xl bg-indigo-600 p-3 text-center text-sm font-semibold text-white transition hover:bg-indigo-700"
               >
                 View Product
-              </button>
+              </Link>
             </div>
           ))
         ) : (
-          <div
-            style={{
-              padding: "24px",
-              border: "1px dashed #d1d5db",
-              borderRadius: "16px",
-              color: "#6b7280",
-              backgroundColor: "#fff",
-            }}
-          >
+          <div className="col-span-full rounded-2xl border border-dashed border-gray-300 bg-white p-6 text-gray-500">
             No matching products found.
           </div>
         )}

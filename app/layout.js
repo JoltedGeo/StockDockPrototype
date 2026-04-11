@@ -1,5 +1,6 @@
 import "./globals.css";
 import Header from "./components/Header";
+import { CartProvider } from "./context/CartContext";
 
 export const metadata = {
   title: "Satguru Store",
@@ -10,8 +11,10 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body className="bg-white">
-        <Header />
-        {children}
+        <CartProvider>
+          <Header />
+          {children}
+        </CartProvider>
       </body>
     </html>
   );
