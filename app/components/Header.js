@@ -6,6 +6,7 @@ import { auth } from "../utils/firebase";
 import { onAuthStateChanged, signOut } from "firebase/auth";
 import { useRouter } from "next/navigation";
 import { useCart } from "../context/CartContext";
+import { useRegion } from "../context/RegionContext";
 
 export default function Header() {
   const [user, setUser] = useState(null);
@@ -15,6 +16,8 @@ export default function Header() {
 
   const { cart } = useCart(); // <-- Access the cart
   const cartItemCount = cart.reduce((total, item) => total + item.quantity, 0);
+  const { region } = useRegion();
+  const currency = region ? region.split("-")[1] : null;
 
   // This useEffect checks the authentication state of the user when the Header component mounts.
   // It listens for changes in authentication status and updates the user state accordingly.
@@ -100,7 +103,9 @@ export default function Header() {
         </nav>
 
           <div className="flex items-center gap-4"> {/* Added a wrapper for Cart + Account */}
-          {/* Cart Icon */}
+            {currency && (
+              <span className="text-sm font-medium text-black">{currency}</span>
+            )}
             <Link href="/cart" className="relative text-black hover:text-gray-600">
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 0 0-16.536-1.84M7.5 14.25 5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z" />
