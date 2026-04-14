@@ -47,12 +47,12 @@ export default function AuthPage() {
   const validateGST = (value) => {
     const country = selectedRegion.split("-")[0];
     const gstPatterns = {
-      CA: /^[1-9]\d{0,8}$/,
-      US: /^[1-9]\d{0,8}$/,
-      GB: /^[1-9]\d{0,8}$/,
-      EU: /^[1-9]\d{0,8}$/,
-      AU: /^[1-9]\d{0,8}$/,
-      IN: /^[1-9]\d{0,8}$/,
+      CA: /^[1-9]\d{8}$/,
+      US: /^[1-9]\d{8}$/,
+      GB: /^[1-9]\d{8}$/,
+      EU: /^[1-9]\d{8}$/,
+      AU: /^[1-9]\d{8}$/,
+      IN: /^[1-9]\d{8}$/,
     };
     const gstPattern = gstPatterns[country];
     return gstPattern ? gstPattern.test(value.trim()) : value.trim().length >= 5;
