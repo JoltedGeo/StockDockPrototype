@@ -10,6 +10,7 @@ import {
   sendPasswordResetEmail,
 } from "firebase/auth";
 import { useRouter } from "next/navigation";
+import { useRegion } from "../context/RegionContext";
 
 export default function AuthPage() {
   const [isRegisterMode, setIsRegisterMode] = useState(false);
@@ -26,7 +27,36 @@ export default function AuthPage() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [message, setMessage] = useState("");
+  const [showRegionModal, setShowRegionModal] = useState(false);
+  const [selectedRegion, setSelectedRegion] = useState("");
+  const [gstNumber, setGstNumber] = useState("");
+  const [gstValid, setGstValid] = useState(null);
   const router = useRouter();
+  const { setRegion } = useRegion();
+
+  const regions = [
+    { label: "Canada (CAD)", value: "CA-CAD" },
+    { label: "United States (USD)", value: "US-USD" },
+    { label: "United Kingdom (GBP)", value: "GB-GBP" },
+    { label: "European Union (EUR)", value: "EU-EUR" },
+    { label: "Australia (AUD)", value: "AU-AUD" }
+  ];
+
+  // function to validate GST number based on selected region.
+  // Currently just hardcoded for simplicity.
+  const validateGST = (value) => {
+    const country = selectedRegion.split("-")[0];
+    const gstPatterns = {
+      CA: /^[1-9]$/,
+      US: /^[1-9]$/,
+      GB: /^[1-9]$/,
+      EU: /^[1-9]$/,
+      AU: /^[1-9]$/,
+      IN: /^[1-9]$/,
+    };
+    const gstPattern = gstPatterns[country];
+    return gstPattern ? gstPattern.test(value.trim()) : value.trim().length >= 5;
+  };
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -37,6 +67,12 @@ export default function AuthPage() {
 
     return () => unsubscribe();
   }, [router]);
+
+  useEffect(() => {
+    if (isRegisterMode) {
+      setShowRegionModal(true);
+    }
+  }, [isRegisterMode]);
 
   const resetFields = () => {
     setEmail("");
@@ -100,7 +136,7 @@ export default function AuthPage() {
       return;
     }
 
-    if (isRegisterMode) {
+if (isRegisterMode) {
     if (password.length < 6) {
       setMessage("Password must be at least 6 characters.");
       return;
@@ -122,6 +158,9 @@ export default function AuthPage() {
     try {
       if (isRegisterMode) {
         await createUserWithEmailAndPassword(auth, email, password);
+        resetFields();
+        setShowRegionModal(true);
+        return;
       } else {
         await signInWithEmailAndPassword(auth, email, password);
       }
@@ -291,6 +330,45 @@ export default function AuthPage() {
                 </div>
               </div>
 
+              {/* GST Number */}
+              <div>
+                <label className="mb-1 block text-sm font-medium text-black">
+                  GST Number
+                </label>
+                <div className="relative">
+                  <input
+                    type="text"
+                    placeholder="Enter your GST number"
+                    value={gstNumber}
+                    onChange={(e) => {
+                      setGstNumber(e.target.value);
+                      if (e.target.value.trim() === "") {
+                        setGstValid(null);
+                      } else {
+                        setGstValid(validateGST(e.target.value));
+                      }
+                    }}
+                    className={`w-full rounded-md border px-4 py-3 pr-10 text-black placeholder-gray-400 focus:outline-none ${
+                      gstValid === null
+                        ? "border-gray-300 focus:border-[#5478FF]"
+                        : gstValid
+                        ? "border-green-500 focus:border-green-500"
+                        : "border-red-500 focus:border-red-500"
+                    }`}
+                  />
+                  {gstValid === true && (
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-green-500">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+                    </svg>
+                  )}
+                  {gstValid === false && (
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-red-500">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
+                    </svg>
+                  )}
+                </div>
+              </div>
+
               {/* Password & Confirm Password */}
               <div className="grid grid-cols-2 gap-4">
                 <div>
@@ -395,10 +473,10 @@ export default function AuthPage() {
 
           <button
             type="submit"
-            className="w-full rounded-md px-4 py-3 text-white hover:opacity-90 cursor-pointer"
+            disabled={isRegisterMode && gstValid !== true}
+            className="w-full rounded-md px-4 py-3 text-white cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed hover:opacity-90 disabled:hover:opacity-50"
             style={{ backgroundColor: "#5478FF" }}
           >
-            {/* The button text changes based on the mode */}
             {isRegisterMode ? "Create Account" : "Sign In"}
           </button>
         </form>
@@ -438,6 +516,59 @@ export default function AuthPage() {
           <p className="mt-4 text-center text-sm text-slate-700">{message}</p>
         )}
       </div>
+
+      {showRegionModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+          <div className="w-full max-w-md rounded-3xl bg-white px-10 py-10 shadow-2xl text-center">
+            <p className="mb-6 text-base text-black">
+              Please select your region &amp; currency
+            </p>
+            <div className="relative mb-6">
+              <select
+                value={selectedRegion}
+                onChange={(e) => setSelectedRegion(e.target.value)}
+                className="w-full rounded-lg border border-gray-300 px-4 py-3 text-gray-400 focus:border-[#5478FF] focus:outline-none appearance-none bg-white"
+              >
+                <option value="" disabled style={{ color: "#9ca3af", fontStyle: "italic" }}>Region &amp; Currency</option>
+                {regions.map((r) => (
+                  <option key={r.value} value={r.value} style={{ color: "#111827", fontStyle: "normal" }}>{r.label}</option>
+                ))}
+              </select>
+              <svg
+                width="20px"
+                height="20px"
+                viewBox="0 0 50 50"
+                xmlns="http://www.w3.org/2000/svg"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"
+                fill="currentColor"
+              >
+                <path d="M25 32.4l-9.7-9.7 1.4-1.4 8.3 8.3 8.3-8.3 1.4 1.4z" />
+              </svg>
+            </div>
+            <button
+              onClick={() => {
+                if (selectedRegion) {
+                  setRegion(selectedRegion);
+                }
+                setShowRegionModal(false);
+              }}
+              className="w-full rounded-lg py-3 text-white font-medium hover:opacity-90"
+              style={{ backgroundColor: "#5478FF" }}
+            >
+              Continue
+            </button>
+            <button
+              onClick={() => {
+                setShowRegionModal(false);
+                router.push("/");
+              }}
+              className="mt-3 w-full text-sm text-black underline hover:text-gray-600"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
     </main>
   );
 }
